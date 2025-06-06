@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event Flow - Discover Events in Halifax</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+        }
+
+        /* Header */
+        .header {
+            background: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 15px 0;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: bold;
+            color: #ff6b35;
+        }
+
+        .search-bar {
+            display: flex;
+            align-items: center;
+            background: #f1f3f4;
+            border-radius: 25px;
+            padding: 12px 20px;
+            width: 400px;
+        }
+
+        .search-bar input {
+            border: none;
+            background: none;
+            outline: none;
+            width: 100%;
+            margin-left: 10px;
+            font-size: 16px;
+        }
+
+        .location {
+            display: flex;
+            align-items: center;
+            color: #666;
+            margin-left: 20px;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: #ff6b35;
+            color: white;
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: #666;
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 80px 0;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-content {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 20px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero h1 {
+            font-size: 48px;
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+
+        .hero p {
+            font-size: 20px;
+            margin-bottom: 30px;
+            opacity: 0.9;
+        }
+
+        .cta-button {
+            background: #ff6b35;
+            color: white;
+            padding: 15px 40px;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            cursor: pointer;
+            margin-right: 15px;
+        }
+
+        .cta-secondary {
+            background: transparent;
+            color: white;
+            border: 2px solid white;
+            padding: 13px 40px;
+            border-radius: 8px;
+            font-size: 18px;
+            cursor: pointer;
+        }
+
+        /* Categories */
+        .categories {
+            padding: 60px 0;
+            background: white;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 32px;
+            margin-bottom: 50px;
+            color: #333;
+        }
+
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 30px;
+        }
+
+        .category-item {
+            text-align: center;
+            padding: 30px 20px;
+            border-radius: 12px;
+            background: #f8f9fa;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .category-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+
+        .category-icon {
+            width: 60px;
+            height: 60px;
+            background: #ff6b35;
+            border-radius: 50%;
+            margin: 0 auto 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: white;
+        }
+
+        /* Filters */
+        .filters {
+            padding: 40px 0;
+            background: #f8f9fa;
+        }
+
+        .filter-tabs {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .filter-tab {
+            padding: 12px 25px;
+            background: white;
+            border: 2px solid #e9ecef;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .filter-tab.active {
+            background: #ff6b35;
+            color: white;
+            border-color: #ff6b35;
+        }
+
+        /* Events Grid */
+        .events {
+            padding: 60px 0;
+            background: white;
+        }
+
+        .events-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .event-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .event-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .event-image {
+            height: 200px;
+            background: linear-gradient(45deg, #ff6b35, #f7931e);
+            position: relative;
+        }
+
+        .event-date {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 12px;
+        }
+
+        .event-content {
+            padding: 20px;
+        }
+
+        .event-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .event-details {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+
+        .event-price {
+            font-size: 16px;
+            font-weight: bold;
+            color: #ff6b35;
+        }
+
+        /* Chat Feature */
+        .chat-float {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #ff6b35;
+            color: white;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(255, 107, 53, 0.4);
+            font-size: 24px;
+        }
+
+        /* Footer */
+        .footer {
+            background: #333;
+            color: white;
+            padding: 40px 0;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="nav-container">
+            <div class="logo">Event Flow</div>
+            
+            <div class="search-bar">
+                <span>🔍</span>
+                <input type="text" placeholder="Search events in Halifax">
+            </div>
+            
+            <div class="location">
+                <span>📍</span>
+                <span>Halifax, NS</span>
+            </div>
+            
+            <div class="nav-buttons">
+                <a href="#" class="btn btn-secondary">Create Event</a>
+                <a href="#" class="btn btn-secondary">Log In</a>
+                <a href="#" class="btn btn-primary">Sign Up</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Discover Amazing Events in Halifax</h1>
+            <p>Find concerts, workshops, meetups and more. Book tickets instantly with our simple platform.</p>
+            <button class="cta-button">Browse Events</button>
+            <button class="cta-secondary">📅 Calendar View</button>
+        </div>
+    </section>
+
+    <!-- Categories -->
+    <section class="categories">
+        <div class="container">
+            <h2 class="section-title">What are you interested in?</h2>
+            <div class="category-grid">
+                <div class="category-item">
+                    <div class="category-icon">🎵</div>
+                    <h3>Music</h3>
+                </div>
+                <div class="category-item">
+                    <div class="category-icon">🎤</div>
+                    <h3>Talks</h3>
+                </div>
+                <div class="category-item">
+                    <div class="category-icon">🧘</div>
+                    <h3>Wellness</h3>
+                </div>
+                <div class="category-item">
+                    <div class="category-icon">🍔</div>
+                    <h3>Food</h3>
+                </div>
+                <div class="category-item">
+                    <div class="category-icon">🎨</div>
+                    <h3>Arts</h3>
+                </div>
+                <div class="category-item">
+                    <div class="category-icon">⚽</div>
+                    <h3>Sports</h3>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Filters -->
+    <section class="filters">
+        <div class="container">
+            <div class="filter-tabs">
+                <div class="filter-tab active">All Events</div>
+                <div class="filter-tab">Today</div>
+                <div class="filter-tab">This Weekend</div>
+                <div class="filter-tab">Free</div>
+                <div class="filter-tab">Music</div>
+                <div class="filter-tab">Online</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Events Grid -->
+    <section class="events">
+        <div class="container">
+            <h2 class="section-title">Popular Events This Week</h2>
+            <div class="events-grid">
+                <div class="event-card">
+                    <div class="event-image">
+                        <div class="event-date">JUN 7</div>
+                    </div>
+                    <div class="event-content">
+                        <h3 class="event-title">Evening Yoga Flow</h3>
+                        <div class="event-details">📍 Peaceful Flow Studio • 7:00 PM</div>
+                        <div class="event-price">$25</div>
+                    </div>
+                </div>
+                
+                <div class="event-card">
+                    <div class="event-image">
+                        <div class="event-date">JUN 8</div>
+                    </div>
+                    <div class="event-content">
+                        <h3 class="event-title">Local Band Showcase</h3>
+                        <div class="event-details">📍 The Marquee Club • 8:00 PM</div>
+                        <div class="event-price">$15</div>
+                    </div>
+                </div>
+                
+                <div class="event-card">
+                    <div class="event-image">
+                        <div class="event-date">JUN 9</div>
+                    </div>
+                    <div class="event-content">
+                        <h3 class="event-title">Tech Startup Meetup</h3>
+                        <div class="event-details">📍 Dalhousie University • 6:00 PM</div>
+                        <div class="event-price">Free</div>
+                    </div>
+                </div>
+                
+                <div class="event-card">
+                    <div class="event-image">
+                        <div class="event-date">JUN 10</div>
+                    </div>
+                    <div class="event-content">
+                        <h3 class="event-title">Art Gallery Opening</h3>
+                        <div class="event-details">📍 Anna Leonowens Gallery • 7:00 PM</div>
+                        <div class="event-price">$10</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Floating Chat Button -->
+    <div class="chat-float">💬</div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2025 Event Flow. Made with ❤️ in Halifax</p>
+        </div>
+    </footer>
+
+    <script>
+        // Simple interactivity
+        document.querySelectorAll('.filter-tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                document.querySelector('.filter-tab.active').classList.remove('active');
+                this.classList.add('active');
+            });
+        });
+
+        document.querySelector('.chat-float').addEventListener('click', function() {
+            alert('Chat feature: Connect with event organizers and other attendees!');
+        });
+
+        document.querySelectorAll('.event-card').forEach(card => {
+            card.addEventListener('click', function() {
+                alert('Navigate to event details page');
+            });
+        });
+    </script>
+</body>
+</html>
